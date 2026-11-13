@@ -15,7 +15,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const content = (
     <>
       <Header />
-      <ThemeToggle />
       <main className="flex-1 container mx-auto px-4 py-6">
         {children}
       </main>
