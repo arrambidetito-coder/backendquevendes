@@ -2,7 +2,6 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useEffect, useState } from 'react';
-import { useClerk } from '@clerk/nextjs';
 
 type DailyStat = {
   date: string;
@@ -10,18 +9,27 @@ type DailyStat = {
   interactions: number;
 };
 
+const DEMO_STATS: DailyStat[] = [
+  { date: 'Lun', views: 24, interactions: 5 },
+  { date: 'Mar', views: 38, interactions: 9 },
+  { date: 'Mié', views: 31, interactions: 7 },
+  { date: 'Jue', views: 45, interactions: 12 },
+  { date: 'Vie', views: 52, interactions: 15 },
+];
+
 export default function StatsChart() {
-  const { user } = useClerk();
-  const [data, setData] = useState<DailyStat[]>([]);
+  const [data, setData] = useState<DailyStat[]>(DEMO_STATS);
 
   useEffect(() => {
-    if (!user?.id) return;
-    fetch(`/api/user/${user.id}/stats/daily`)
-      .then(r => r.json())
-      .then(setData);
-  }, [user?.id]);
-
-  if (!data.length) return <p>Cargando estadísticas…</p>;
+    fetch('/api/user/demo/stats/daily')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((res) => {
+        if (Array.isArray(res) && res.length > 0) {
+          setData(res);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <ResponsiveContainer width="100%" height={300}>
