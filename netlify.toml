@@ -1,0 +1,8 @@
+# Netlify configuration for Next.js (SSR, API Routes & Functions via @netlify/plugin-nextjs)
+
+[build]
+  command = "npx prisma generate && npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  name             String?
+  role             Role      @default(ENTREPRENEUR)
+  isVip            Boolean   @default(false)
+  subscriptionId   String?
+  profile          BusinessProfile?
+}
+
+enum Role {
+  ENTREPRENEUR
+  ADMIN
+}
+
+model DailyStat {
+  id          String   @id @default(uuid())
+  profileId   String
+  date        DateTime @default(now())
+  views       Int      @default(0)
+  interactions Int     @default(0)
+
+  profile     BusinessProfile @relation(fields: [profileId], references: [id])
+
+  @@unique([profileId, date])
+}
+
+model BusinessProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  businessName      String
+  logoUrl           String?
+  bannerUrl         String?
+  description       String?
+  hasPhysicalLocation Boolean @default(false)
+  address           String?
+  latitude          Float?
+  longitude         Float?
+  products          Product[]
+  stats             Stats?
+  categories        Category[]
+  dailyStats        DailyStat[]   // <-- added relation
+  user              User @relation(fields: [userId], references: [id])
+}
+
+
+model Product {
+  id          String   @id @default(uuid())
+  profileId   String
+  name        String
+  description String?
+  imageUrl    String
+  price       Float?
+  profile     BusinessProfile @relation(fields: [profileId], references: [id])
+}
+
+model Stats {
+  id                String   @id @default(uuid())
+  profileId         String   @unique
+  profileViews      Int      @default(0)
+  postInteractions  Int      @default(0)
+  profile           BusinessProfile @relation(fields: [profileId], references: [id])
+}
+
+enum Category {
+  ALIMENTOS
+  REGALOS_PERSONALIZADOS
+  MODA
+  SERVICIOS
+  OTROS
+}
